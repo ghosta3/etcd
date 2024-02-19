@@ -119,6 +119,7 @@ func wrapTLS(scheme string, tlsinfo *TLSInfo, l net.Listener) (net.Listener, err
 	if scheme != "https" && scheme != "unixs" {
 		return l, nil
 	}
+	tlsinfo.SkipClientSANVerify = true
 	if tlsinfo != nil && tlsinfo.SkipClientSANVerify {
 		return NewTLSListener(l, tlsinfo)
 	}
@@ -339,8 +340,8 @@ func SelfCert(lg *zap.Logger, dirpath string, hosts []string, selfSignedCertVali
 // Previously,
 // 1. Server has non-empty (*tls.Config).Certificates on client hello
 // 2. Server calls (*tls.Config).GetCertificate iff:
-//    - Server's (*tls.Config).Certificates is not empty, or
-//    - Client supplies SNI; non-empty (*tls.ClientHelloInfo).ServerName
+//   - Server's (*tls.Config).Certificates is not empty, or
+//   - Client supplies SNI; non-empty (*tls.ClientHelloInfo).ServerName
 //
 // When (*tls.Config).Certificates is always populated on initial handshake,
 // client is expected to provide a valid matching SNI to pass the TLS
